@@ -4,6 +4,7 @@ namespace DeShawnsDogWalking.Models
     {
         public int Id { get; set; }
         public string Name { get; set; }
+        public string Email { get; set; }
         public List<WalkerCity> Cities { get; set; }
         public List<Dog> Dogs { get; set; }
     }
