@@ -1,4 +1,6 @@
+using System.Text.Json.Serialization;
 using DeShawnsDogWalking.Models;
+using Microsoft.AspNetCore.Http.Json;
 
 // Collections for your project's data
 List<Walker> walkers = new List<Walker>
@@ -69,8 +71,17 @@ List<City> cities = new List<City>
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+// Set the JSON serializer options
+ 
+
+builder.Services.Configure<JsonOptions>(options =>
+{
+    options.SerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+});
+
+
+// Set the JSON serializer options end
+
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
@@ -89,6 +100,14 @@ app.MapGet("/api/hello", () =>
 {
     return new { Message = "Welcome to DeShawn's Dog Walking" };
 });
+
+//creat basic endpoints needed below;
+app.MapGet("/api/dogs", () =>
+{
+    return dogs;
+});
+
+
 
 
 app.Run();
