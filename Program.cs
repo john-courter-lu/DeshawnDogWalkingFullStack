@@ -107,6 +107,22 @@ app.MapGet("/api/dogs", () =>
     return dogs;
 });
 
+// dog details
+app.MapGet("/api/dogs/{id}", (int id) =>
+{
+    Dog dog = dogs.FirstOrDefault(d => d.Id == id);
+
+    if (dog == null)
+    {
+        return Results.NotFound();
+    }
+
+    // Assuming you have Walker and City collections available
+    dog.Walker = walkers.FirstOrDefault(w => w.Id == dog.WalkerId);
+    dog.City = cities.FirstOrDefault(c => c.Id == dog.CityId);
+
+    return Results.Ok(dog);
+});
 
 
 
