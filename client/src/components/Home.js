@@ -7,6 +7,8 @@ import Paper from '@mui/material/Paper';
 import Container from '@mui/material/Container';
 import Grid from '@mui/material/Grid';
 import { experimentalStyled as styled } from '@mui/material/styles';
+import { Button } from "@mui/material";
+
 
 const Item = styled(Paper)(({ theme }) => ({
   backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
@@ -61,5 +63,7 @@ export default function Home() {
         }
       </Grid>
     </Container>
+    <h2>Add a dog?</h2>
+    <Button><Link to={`/add-a-dog`}>Add Dog</Link></Button>
   </>)
 }
