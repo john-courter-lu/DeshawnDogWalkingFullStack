@@ -33,3 +33,13 @@ export const createDog = async (dog) => {
     throw new Error("Failed to create a new dog");
   }
 };
+
+export const deleteDog = async (dogId) => {
+  const response = await fetch(`/api/dogs/${dogId}`, {
+    method: "DELETE"
+  });
+
+  if (!response.ok) {
+    throw new Error("Error deleting dog");
+  }
+};
