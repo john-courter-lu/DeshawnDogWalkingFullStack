@@ -3,7 +3,7 @@ import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
 import { useParams } from "react-router-dom"
 import { useNavigate } from "react-router-dom"
-import { getCities } from "../apiManager.js"
+import { getCities, createDog } from "../apiManager.js"
 
 export const AddADog = () => {
 
@@ -19,19 +19,34 @@ export const AddADog = () => {
         []
     )
 
-    const handleSaveButtonClick = (event) => {
+    const handleSaveButtonClick = async (event) => {
 
         event.preventDefault()
 
-        //第一步 用POST 新建一个dog json
+        //step 1 create a dog object as the a json body sent to API POST
         const dogObjToSend = {
             name: newDog.name,
-            cityId: newDog.cityId,
+            cityId: parseInt(newDog.cityId) 
+            // Parse cityId to an integer
         };
 
-        //第二步 用POST 于API连接
+        //Step 2 use creatDog in apiManager to post the dog json
+        try {
 
+            const createdDog = await createDog(dogObjToSend);
+
+            // Handle success - you can navigate or perform any other action here
+            console.log("New dog created:", createdDog);
+
+            navigate(`/dogs/${createdDog.id}`);
+            // Navigate to the dog detail page 
+
+        } catch (error) {
+            // Handle error - display an error message or take appropriate action
+            console.error("Error creating a new dog:", error);
+        }
     }
+
 
     return (
         <>
