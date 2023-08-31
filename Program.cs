@@ -124,6 +124,10 @@ app.MapGet("/api/dogs/{id}", (int id) =>
     return Results.Ok(dog);
 });
 
+app.MapGet("/api/cities", () =>
+{
+    return cities;
+});
 
 
 app.Run();
