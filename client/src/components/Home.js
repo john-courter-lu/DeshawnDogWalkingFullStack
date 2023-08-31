@@ -1,5 +1,5 @@
 import { Link } from "react-router-dom";
-import { getDogs, getGreeting } from "../apiManager";
+import { deleteDog, getDogs, getGreeting } from "../apiManager";
 import { useEffect, useState } from "react";
 
 import * as React from 'react';
@@ -41,6 +41,16 @@ export default function Home() {
       });
   }, [])
 
+  const handleRemoveClick = async (dogId) => {
+    try {
+      await deleteDog(dogId);
+      // Update the dogs state to remove the deleted dog
+      setDogs(dogs.filter(dog => dog.id !== dogId));
+    } catch (error) {
+      console.error("Error deleting dog:", error);
+    }
+  };
+
   return (<>
     <p>{greeting.message}</p>
     <h2>List of Dogs</h2>
@@ -50,10 +60,20 @@ export default function Home() {
           dogs.map(dog => {
             return (
 
-              <Grid item xs={4} sm={3} md={2} className="dog" key={`dog--${dog.id} `}>
+              <Grid item xs={6} sm={3} md={2} className="dog" key={`dog--${dog.id} `}>
                 <Item>
                   <Paper elevation={4}>
                     <Link to={`/dogs/${dog.id}`}>{dog.name}</Link>
+
+                    <Button
+                      onClick={() => handleRemoveClick(dog.id)}
+                      variant="outlined"
+                      color="secondary"
+                      size="small"
+                    >
+                      Remove
+                    </Button>
+
                   </Paper>
                 </Item>
               </Grid >
@@ -64,6 +84,6 @@ export default function Home() {
       </Grid>
     </Container>
     <h2>Add a dog?</h2>
-    <Button><Link to={`/add-a-dog`}>Add Dog</Link></Button>
+    <Button variant="outlined"><Link to={`/add-a-dog`}>Add Dog</Link></Button>
   </>)
 }

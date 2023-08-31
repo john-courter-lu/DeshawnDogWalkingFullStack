@@ -162,5 +162,17 @@ app.MapPost("/api/dogs", (Dog newDog) =>
 
 });
 
+app.MapDelete("/api/dogs/{id}", (int id) =>
+{
+    
+  Dog dogToRemove = dogs.FirstOrDefault(dog => dog.Id == id);
+
+    if (dogToRemove != null)
+    {
+        dogs.Remove(dogToRemove);
+    }
+
+});
+
 
 app.Run();
