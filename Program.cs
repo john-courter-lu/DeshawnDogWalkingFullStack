@@ -64,15 +64,15 @@ List<City> cities = new List<City>
     new City { Id = 10, Name = "Chicago" }
 };
 
-           
-           
+
+
 
 
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Set the JSON serializer options
- 
+
 
 builder.Services.Configure<JsonOptions>(options =>
 {
@@ -124,6 +124,43 @@ app.MapGet("/api/dogs/{id}", (int id) =>
     return Results.Ok(dog);
 });
 
+app.MapGet("/api/cities", () =>
+{
+    return cities;
+});
+
+app.MapPost("/api/dogs", (Dog newDog) =>
+{
+    // Assign an automatically generated ID
+    newDog.Id = dogs.Max(d => d.Id) + 1;
+
+    // Add the new dog to the collection
+    dogs.Add(newDog);
+
+    // Return the newly created dog with the assigned ID
+
+    //return Results.Created($"/api/dogs/{newDog.Id}", newDog);
+    // 这个会返回 code 201 Created
+    // 在return 的headers 中会显示:Location: /api/dogs/12
+
+    return Results.Ok(newDog);
+    //这个结果return只会返回newDog的json body, 像是一个json object
+
+    //这两个结果都会返回newDog, 也就是fetch最后res.json()返回的主体
+    /* 
+    
+    {
+    "id": 12,
+    "name": "string",
+    "cityId": 1,
+    "walkerId": null,
+    "city": null,
+    "walker": null
+    }
+
+    */
+
+});
 
 
 app.Run();

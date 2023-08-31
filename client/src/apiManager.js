@@ -12,3 +12,24 @@ export const getDogById = async (id) => {
   const res = await fetch(`/api/dogs/${id}`);
   return res.json();
 };
+
+export const getCities = async () => {
+  const res = await fetch("/api/cities");
+  return res.json();
+};
+
+export const createDog = async (dog) => {
+  const res = await fetch("/api/dogs", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(dog),
+  });
+
+  if (res.status === 200) {
+    return res.json();
+  } else {
+    throw new Error("Failed to create a new dog");
+  }
+};
