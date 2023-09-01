@@ -129,6 +129,11 @@ app.MapGet("/api/cities", () =>
     return cities;
 });
 
+app.MapGet("/api/walkers", () =>
+{
+    return walkers;
+});
+
 app.MapPost("/api/dogs", (Dog newDog) =>
 {
     // Assign an automatically generated ID
