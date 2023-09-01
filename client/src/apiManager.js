@@ -43,3 +43,5 @@ export const deleteDog = async (dogId) => {
     throw new Error("Error deleting dog");
   }
 };
+
+
