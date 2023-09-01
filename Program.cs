@@ -162,9 +162,24 @@ app.MapPost("/api/dogs", (Dog newDog) =>
 
 });
 
+app.MapPost("/api/cities", (City city) =>
+{
+    // Add the new city to your data source
+    // Assign an automatically generated ID
+    city.Id = cities.Max(d => d.Id) + 1;
+    // Add the new dog to the collection
+    cities.Add(city);
+
+    // Return the newly created city
+    return Results.Created($"/api/cities/{city.Id}", city);
+    //这会返回201 Created / Undocumented, 
+    //会pass if(response.ok) , Results.OK是默认, 但是Results.Created也行
+});
+
+
 app.MapDelete("/api/dogs/{id}", (int id) =>
 {
-    
+
   Dog dogToRemove = dogs.FirstOrDefault(dog => dog.Id == id);
 
     if (dogToRemove != null)
