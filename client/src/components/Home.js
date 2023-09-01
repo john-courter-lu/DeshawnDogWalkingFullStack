@@ -45,6 +45,7 @@ export default function Home() {
     try {
       await deleteDog(dogId);
       // Update the dogs state to remove the deleted dog
+      // 这是亮点. 不需要重新fetch, 而是通过setDogs来不断重写dogs这个数组
       setDogs(dogs.filter(dog => dog.id !== dogId));
     } catch (error) {
       console.error("Error deleting dog:", error);

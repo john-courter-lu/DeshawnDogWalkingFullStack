@@ -34,6 +34,23 @@ export const createDog = async (dog) => {
   }
 };
 
+export const addCity = async (city) => {
+  const response = await fetch("/api/cities", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify(city),
+  });
+
+  if (!response.ok) {
+    throw new Error("Error adding city");
+  }
+
+  return response.json();
+};
+
+
 export const deleteDog = async (dogId) => {
   const response = await fetch(`/api/dogs/${dogId}`, {
     method: "DELETE"
@@ -43,3 +60,5 @@ export const deleteDog = async (dogId) => {
     throw new Error("Error deleting dog");
   }
 };
+
+
