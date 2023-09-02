@@ -131,7 +131,31 @@ app.MapGet("/api/cities", () =>
 
 app.MapGet("/api/walkers", () =>
 {
-    return walkers;
+    List<Walker> walkersWithDetails = walkers.Select(walker =>
+{
+    int id = walker.Id;
+    List<WalkerCity> walkerCitiesForSingleWalker = walkerCities.Where(obj => obj.WalkerId == id).ToList();
+    //找到所有walkerId符合的bridge table中的项目
+
+    List<City> citiesForSingleWalker = walkerCitiesForSingleWalker.Select(wc => cities.First(c => c.Id == wc.CityId)).ToList();
+    //这不是List<WalkerCity>中的property:public City City的找法.
+    //那会是从CityId到City, 只要对比id即可, 而且是单个obj
+    //而这里是一个collection, 因为一个walker可以在多个cities里工作
+
+    Walker walkerWithDetails = new Walker
+    {
+        Id = walker.Id,
+        Name = walker.Name,
+        Email = walker.Email,
+
+        Cities = citiesForSingleWalker
+
+    };
+
+    return walkerWithDetails;
+}).ToList();
+
+    return Results.Ok(walkersWithDetails);
 });
 
 app.MapPost("/api/dogs", (Dog newDog) =>
@@ -185,7 +209,7 @@ app.MapPost("/api/cities", (City city) =>
 app.MapDelete("/api/dogs/{id}", (int id) =>
 {
 
-  Dog dogToRemove = dogs.FirstOrDefault(dog => dog.Id == id);
+    Dog dogToRemove = dogs.FirstOrDefault(dog => dog.Id == id);
 
     if (dogToRemove != null)
     {
