@@ -61,19 +61,33 @@ export const WalkerList = () => {
                 </Select>
             </FormControl>
 
-            <Paper elevation={3}>
+            <Paper elevation={3} sx={{ mx: 'auto', my: 1, maxWidth: 500 }}>
+                {/* sx= style; mx 水平; my 竖直; mx: 'auto' 居中; 好像不能同时指定四个margin  */}
                 <List>
                     {walkers
-                    //filter out selected city
-                    .filter((walker) => !selectedCity || walker.cities.includes(selectedCity))
-                    // If no city is selected (!selectedCity evaluates to true), we display all walkers. Otherwise, we only display walkers whose cities property includes the selected city.
-                    .map((walker) => (
-                        <ListItem key={walker.id}>
-                            <ListItemText
-                                primary={walker.name}
-                                style={{ textAlign: "center" }} />
-                        </ListItem>
-                    ))}
+                        //filter out selected city
+                        .filter((walker) => !selectedCity || walker.cities.some((city) => city.name === selectedCity)
+                        )
+                        // If no city is selected (!selectedCity evaluates to true), we display all walkers.
+                        //实际walker.cities是一个包含id和name的objects的array, 所以用.some()
+                        //原来是walker.cities.includes(selectedCity)
+                        //这是假设walker.cities是一个只包括city names的array
+                        // Otherwise, we only display walkers whose cities property includes the selected city.
+                        .map((walker) => (
+                            <ListItem key={walker.id}
+                            >
+                                <ListItemText
+                                    primary={walker.name}
+
+                                />
+                                <div>
+                                    <strong>Cities: </strong>
+                                    {walker.cities.map((city) => (
+                                        <span key={city.id}>{city.name}; </span>
+                                    ))}
+                                </div>
+                            </ListItem>
+                        ))}
                 </List>
             </Paper>
         </div>
