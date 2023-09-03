@@ -15,6 +15,9 @@ export const WalkerList = () => {
     const [openAssignDialog, setOpenAssignDialog] = useState(false);
     const [selectedWalker, setSelectedWalker] = useState(null);
 
+    // 为了方便在关闭对话框的时候把dogs还原为全部dogs,这样设置一个新名字
+    const [filteredDogs, setFilteredDogs] = useState([]);
+
     useEffect(() => {
         // Fetch the list of walkers when the component mounts
         getWalkers()
@@ -35,8 +38,13 @@ export const WalkerList = () => {
 
     useEffect(() => {
         // Fetch the list of dogs
+        // 一开始filteredDogs也必须赋值, 否则popup window中无法dogs.map(), 即使不显示
+        // 这里不要用.then()两次来set, 会失败, 估计第二行上面的data不一样了. 而是data后=>直接做两个动作
         getDogs()
-            .then((data) => setDogs(data))
+            .then((data) => {
+                setDogs(data);
+                setFilteredDogs(data)
+            })
             .catch((error) => {
                 console.error("Error fetching dogs:", error);
             });
@@ -45,6 +53,22 @@ export const WalkerList = () => {
 
     const handleAssignDogClick = (walker) => {
         setSelectedWalker(walker);
+
+        //在初始状态时, Dialog Window显示所有dogs, 即使open=false, 也就是不显示
+        //不可以在Dialog Window中filter, 因为这样初始render会失败, 因为user还米有选择selectedWalker, 会显示无法.map
+        //所以, 最好是在点击时, 把dogs filter成我们要的.
+        //而且, 要用walker.cities.map 而不是selectedWalker.cities.map
+        //因为setSelectedWalker是有延迟的.
+        
+
+        const dogsInSelectedWalkerCity = dogs.filter(
+            (dog) => {
+                const selectedWalkerCityIds = walker.cities.map((city) => city.id)
+                return selectedWalkerCityIds.includes(dog.cityId)
+            }
+        )
+        setFilteredDogs(dogsInSelectedWalkerCity)
+
         setOpenAssignDialog(true);
     };
 
@@ -122,8 +146,11 @@ export const WalkerList = () => {
             {/* Add the AssignADog component */}
             <AssignADog
                 open={openAssignDialog}
-                dogs={dogs}
-                onClose={() => setOpenAssignDialog(false)}
+                dogs={filteredDogs}
+                //把filteredDogs 传递过去, 而不是全部数组(一开始的时候是.)
+                onClose={() => {
+                    setOpenAssignDialog(false);
+                }}
                 onAssign={handleAssignDog}
             />
         </div>
