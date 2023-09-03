@@ -1,11 +1,19 @@
 import React, { useEffect, useState } from "react";
-import { FormControl, InputLabel, List, ListItem, ListItemText, MenuItem, Paper, Select, Typography } from "@mui/material";
-import { getCities, getWalkers } from "../apiManager";
+import { FormControl, InputLabel, List, ListItem, ListItemText, MenuItem, Paper, Select, Typography, Button } from "@mui/material";
+import { getCities, getWalkers, getDogs } from "../apiManager";
+import { AssignADog } from "./AssignADog.js";
+// getCities is for dropdown menu of selecting a city
+// getDogs is for AssignADog
 
 export const WalkerList = () => {
     const [walkers, setWalkers] = useState([]);
     const [cities, setCities] = useState([]);
     const [selectedCity, setSelectedCity] = useState(""); // Track the selected city
+
+    // for dialog window and assigning dog
+    const [dogs, setDogs] = useState([]);
+    const [openAssignDialog, setOpenAssignDialog] = useState(false);
+    const [selectedWalker, setSelectedWalker] = useState(null);
 
     useEffect(() => {
         // Fetch the list of walkers when the component mounts
@@ -25,8 +33,26 @@ export const WalkerList = () => {
             });
     }, []);
 
+    useEffect(() => {
+        // Fetch the list of dogs
+        getDogs()
+            .then((data) => setDogs(data))
+            .catch((error) => {
+                console.error("Error fetching dogs:", error);
+            });
+    }, []);
+    // 其实也可以把多个fetch 放到一个useEffect中
 
+    const handleAssignDogClick = (walker) => {
+        setSelectedWalker(walker);
+        setOpenAssignDialog(true);
+    };
 
+    const handleAssignDog = (dogId) => {
+        // Assign the selected dog to the walker (next step: implement this part)
+        console.log(`Assigning dog ${dogId} to walker ${selectedWalker.name}`);
+        setOpenAssignDialog(false);
+    };
 
     return (
         <div>
@@ -34,7 +60,7 @@ export const WalkerList = () => {
                 List of Walkers
             </Typography>
 
-            {/* City selection dropdown */}
+            {/* 👇City selection dropdown */}
             <FormControl
                 variant="outlined"
                 sx={{ m: 1, minWidth: 200 }}
@@ -60,6 +86,7 @@ export const WalkerList = () => {
                     ))}
                 </Select>
             </FormControl>
+            {/* 👆City selection dropdown */}
 
             <Paper elevation={3} sx={{ mx: 'auto', my: 1, maxWidth: 500 }}>
                 {/* sx= style; mx 水平; my 竖直; mx: 'auto' 居中; 好像不能同时指定四个margin  */}
@@ -80,16 +107,35 @@ export const WalkerList = () => {
                                     primary={walker.name}
 
                                 />
+                                <Button
+                                    variant="outlined"
+                                    sx={{ ml: 1 }}
+                                    onClick={
+                                        () => handleAssignDogClick(walker)}
+                                >
+                                    Assign Dog
+                                </Button>
+                            </ListItem>
+                        ))}
+                </List>
+            </Paper>
+            {/* Add the AssignADog component */}
+            <AssignADog
+                open={openAssignDialog}
+                dogs={dogs}
+                onClose={() => setOpenAssignDialog(false)}
+                onAssign={handleAssignDog}
+            />
+        </div>
+    );
+}
+
+/* 
+可以被加入来显示cities of a walker
                                 <div>
                                     <strong>Cities: </strong>
                                     {walker.cities.map((city) => (
                                         <span key={city.id}>{city.name}; </span>
                                     ))}
                                 </div>
-                            </ListItem>
-                        ))}
-                </List>
-            </Paper>
-        </div>
-    );
-}
+*/
