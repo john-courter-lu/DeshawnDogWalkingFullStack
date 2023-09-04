@@ -47,7 +47,11 @@ List<WalkerCity> walkerCities = new List<WalkerCity>
     new WalkerCity { Id = 11, WalkerId = 6, CityId = 9 },
     new WalkerCity { Id = 12, WalkerId = 9, CityId = 7 },
     new WalkerCity { Id = 13, WalkerId = 5, CityId = 7 },
-    new WalkerCity { Id = 14, WalkerId = 10, CityId = 2 }
+    new WalkerCity { Id = 14, WalkerId = 10, CityId = 2 },
+    new WalkerCity { Id = 15, WalkerId = 3, CityId = 1 },
+    new WalkerCity { Id = 16, WalkerId = 7, CityId = 3 },
+    new WalkerCity { Id = 17, WalkerId = 3, CityId = 4 },
+    new WalkerCity { Id = 18, WalkerId = 8, CityId = 5 }
 };
 
 List<City> cities = new List<City>
