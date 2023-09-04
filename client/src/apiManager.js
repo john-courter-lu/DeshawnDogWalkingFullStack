@@ -66,17 +66,28 @@ export const deleteDog = async (dogId) => {
   }
 };
 
-export const assignWalkerToDog = async (dogId, walkerId) => {
-  const response = await fetch(`/api/dogs/${dogId}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      DogId: dogId,
-      WalkerId: walkerId,
-    }),
-  });
-  return response.json();
+export const assignWalkerToDog = async (dogId, updatedDog) => {
+  try {
+    const response = await fetch(`/api/dogs/${dogId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedDog),
+    });
+
+    //下面用if 和 try...catch来捕捉:
+    //1. http response status; 
+    //2. runtime error
+    if (!response.ok) {
+      throw new Error(`Error assigning walker to dog (Status ${response.status})`);
+    }
+
+    return response.json();
+
+  } catch (error) {
+    console.error("Error assigning walker to dog:", error);
+    throw error;
+  }
 };
 
