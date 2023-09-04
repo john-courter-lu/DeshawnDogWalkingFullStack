@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { FormControl, InputLabel, List, ListItem, ListItemText, MenuItem, Paper, Select, Typography, Button } from "@mui/material";
 import { getCities, getWalkers, getDogs } from "../apiManager";
 import { AssignADog } from "./AssignADog.js";
+import { useNavigate } from "react-router-dom";
 // getCities is for dropdown menu of selecting a city
 // getDogs is for AssignADog
 
@@ -51,7 +52,7 @@ export const WalkerList = () => {
     }, []);
     // 其实也可以把多个fetch 放到一个useEffect中
 
-    const handleAssignDogClick = (walker) => {
+    const handleShowDogListToAssign = (walker) => {
         setSelectedWalker(walker);
 
         //在初始状态时, Dialog Window显示所有dogs, 即使open=false, 也就是不显示
@@ -76,11 +77,13 @@ export const WalkerList = () => {
         setOpenAssignDialog(true);
     };
 
-    const handleAssignDog = (dogId) => {
-        // Assign the selected dog to the walker (next step: implement this part)
-        console.log(`Assigning dog ${dogId} to walker ${selectedWalker.name}`);
-        setOpenAssignDialog(false);
+    const navigate = useNavigate();
+    const handleAssignDogConfirm = (dogId) => {
+        // Assign the selected dog to the walker
+        window.alert(`Assigning dog ${dogId} to walker ${selectedWalker.name}`);
+        navigate(`/dogs/${dogId}`);
     };
+    //可以和子组件AssignADog中的handleAssignDog合并
 
     return (
         <div>
@@ -139,7 +142,7 @@ export const WalkerList = () => {
                                     variant="outlined"
                                     sx={{ ml: 1 }}
                                     onClick={
-                                        () => handleAssignDogClick(walker)}
+                                        () => handleShowDogListToAssign(walker)}
                                 >
                                     Assign Dog
                                 </Button>
@@ -150,12 +153,15 @@ export const WalkerList = () => {
             {/* Add the AssignADog component */}
             <AssignADog
                 open={openAssignDialog}
-                dogs={filteredDogs}
+                dogs={dogs}
+                filtereddogs={filteredDogs}
                 //把filteredDogs 传递过去, 而不是全部数组(一开始的时候是.)
+                selectedWalker={selectedWalker}
+                //传过去来组织updatedDog的object
                 onClose={() => {
                     setOpenAssignDialog(false);
                 }}
-                onAssign={handleAssignDog}
+                onAssign={handleAssignDogConfirm}
             />
         </div>
     );
