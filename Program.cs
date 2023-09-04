@@ -209,6 +209,33 @@ app.MapPost("/api/cities", (City city) =>
     //会pass if(response.ok) , Results.OK是默认, 但是Results.Created也行
 });
 
+app.MapPut("/api/dogs/{id}", (int id, Dog updatedDog) =>
+{
+    // Find the dog by its ID
+    // and the goal is to get the index of it so we can update that obj in List<Dog> dogs
+    Dog dogToUpdate = dogs.FirstOrDefault(d => d.Id == id);
+    int dogToUpdateIndex = dogs.IndexOf(dogToUpdate);
+
+    if (dogToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    if (id != updatedDog.Id)
+    {
+        return Results.BadRequest();
+    }
+
+    dogs[dogToUpdateIndex] = updatedDog;
+    // 这是PUT的核心: 新object取代旧的object, 所以前端要保证新的object的完整性.
+
+    //下面加入两个properties
+    updatedDog.Walker = walkers.FirstOrDefault(w => w.Id == updatedDog.WalkerId);
+    updatedDog.City = cities.FirstOrDefault(c => c.Id == updatedDog.CityId);
+    //👆这一步也可以省略, 若想要在前端用getDogById来重新fetch也可以
+
+    return Results.Json(updatedDog);
+});
+
 
 app.MapDelete("/api/dogs/{id}", (int id) =>
 {

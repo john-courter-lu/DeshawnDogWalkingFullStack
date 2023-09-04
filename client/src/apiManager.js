@@ -66,4 +66,17 @@ export const deleteDog = async (dogId) => {
   }
 };
 
+export const assignWalkerToDog = async (dogId, walkerId) => {
+  const response = await fetch(`/api/dogs/${dogId}`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      DogId: dogId,
+      WalkerId: walkerId,
+    }),
+  });
+  return response.json();
+};
 
