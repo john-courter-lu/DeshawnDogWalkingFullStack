@@ -59,7 +59,7 @@ export const WalkerList = () => {
         //所以, 最好是在点击时, 把dogs filter成我们要的.
         //而且, 要用walker.cities.map 而不是selectedWalker.cities.map
         //因为setSelectedWalker是有延迟的.
-        
+
 
         const dogsInSelectedWalkerCity = dogs.filter(
             (dog) => {
@@ -67,7 +67,11 @@ export const WalkerList = () => {
                 return selectedWalkerCityIds.includes(dog.cityId)
             }
         )
-        setFilteredDogs(dogsInSelectedWalkerCity)
+        const onlyDogsNotAssignedToMe = dogsInSelectedWalkerCity
+            .filter(
+                dog => dog.walkerId !== walker.id
+            )
+        setFilteredDogs(onlyDogsNotAssignedToMe)
 
         setOpenAssignDialog(true);
     };
