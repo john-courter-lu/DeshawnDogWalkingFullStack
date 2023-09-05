@@ -47,7 +47,11 @@ List<WalkerCity> walkerCities = new List<WalkerCity>
     new WalkerCity { Id = 11, WalkerId = 6, CityId = 9 },
     new WalkerCity { Id = 12, WalkerId = 9, CityId = 7 },
     new WalkerCity { Id = 13, WalkerId = 5, CityId = 7 },
-    new WalkerCity { Id = 14, WalkerId = 10, CityId = 2 }
+    new WalkerCity { Id = 14, WalkerId = 10, CityId = 2 },
+    new WalkerCity { Id = 15, WalkerId = 3, CityId = 1 },
+    new WalkerCity { Id = 16, WalkerId = 7, CityId = 3 },
+    new WalkerCity { Id = 17, WalkerId = 3, CityId = 4 },
+    new WalkerCity { Id = 18, WalkerId = 8, CityId = 5 }
 };
 
 List<City> cities = new List<City>
@@ -203,6 +207,33 @@ app.MapPost("/api/cities", (City city) =>
     return Results.Created($"/api/cities/{city.Id}", city);
     //这会返回201 Created / Undocumented, 
     //会pass if(response.ok) , Results.OK是默认, 但是Results.Created也行
+});
+
+app.MapPut("/api/dogs/{id}", (int id, Dog updatedDog) =>
+{
+    // Find the dog by its ID
+    // and the goal is to get the index of it so we can update that obj in List<Dog> dogs
+    Dog dogToUpdate = dogs.FirstOrDefault(d => d.Id == id);
+    int dogToUpdateIndex = dogs.IndexOf(dogToUpdate);
+
+    if (dogToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    if (id != updatedDog.Id)
+    {
+        return Results.BadRequest();
+    }
+
+    dogs[dogToUpdateIndex] = updatedDog;
+    // 这是PUT的核心: 新object取代旧的object, 所以前端要保证新的object的完整性.
+
+    //下面加入两个properties
+    updatedDog.Walker = walkers.FirstOrDefault(w => w.Id == updatedDog.WalkerId);
+    updatedDog.City = cities.FirstOrDefault(c => c.Id == updatedDog.CityId);
+    //👆这一步也可以省略, 若想要在前端用getDogById来重新fetch也可以
+
+    return Results.Json(updatedDog);
 });
 
 
