@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { FormControl, InputLabel, List, ListItem, ListItemText, MenuItem, Paper, Select, Typography, Button } from "@mui/material";
-import { getCities, getWalkers, getDogs } from "../apiManager";
+import { getCities, getWalkers, getDogs, removeWalker, assignWalkerToDog } from "../apiManager";
 import { AssignADog } from "./AssignADog.js";
 import { useNavigate } from "react-router-dom";
 // getCities is for dropdown menu of selecting a city
@@ -85,6 +85,51 @@ export const WalkerList = () => {
     };
     //可以和子组件AssignADog中的handleAssignDog合并
 
+    const handleRemoveClick = (walkerId) => {
+        // Handle the removal of a walker when the "Remove" button is clicked
+        removeWalker(walkerId) //调用removeWalker, 从apiManager中
+            .then((success) => { //提示: removeWalker() 会return true; success等价于data
+                if (success) { //等价于if(data===ture)
+                    // If removal was successful, update the list of walkers
+                    setWalkers((prevWalkers) =>
+                        prevWalkers.filter((walker) => walker.id !== walkerId)
+                    );
+                    //这里直接用setWalkers来更新UI, 等价于refetch
+                    /* 
+                    When you use the functional form of setState, React provides you with the previous state as an argument to your function. 
+                    
+                    React automatically passes the current state (the previous state before the update) as prevWalkers to your callback function  provided to setWalkers.
+                    
+                    */
+                }
+            })
+            .catch((error) => {
+                console.error("Error removing walker:", error);
+            });
+
+        //下一步: update dogs' walkerId
+        //第一步 找到所有dogsWalkedByMe 会返回一个数组
+
+        const dogsWalkedByMe = dogs.filter(dog=>dog.walkerId === walkerId);
+
+        //第二步 每一个dog都updateDogs
+
+        dogsWalkedByMe.forEach(dog => {
+
+            const updatedDogtoSend = {
+                id: dog.id,
+                name: dog.name,
+                cityId: dog.cityId,
+                // walkerId 省略, 来得到null
+            }
+
+            assignWalkerToDog(dog.id, updatedDogtoSend)
+            //必须要调用apiManager才能达到改动database的目的, 不能只改变UI的结果
+            //可以在List of Dogs检查结果
+        });
+        
+    };
+
     return (
         <div>
             <Typography variant="h4" gutterBottom>
@@ -145,6 +190,14 @@ export const WalkerList = () => {
                                         () => handleShowDogListToAssign(walker)}
                                 >
                                     Assign Dog
+                                </Button>
+                                <Button
+                                    variant="outlined"
+                                    color="secondary"
+                                    sx={{ ml: 1 }}
+                                    onClick={() => handleRemoveClick(walker.id)} // Call the removal function
+                                >
+                                    Remove
                                 </Button>
                             </ListItem>
                         ))}

@@ -55,17 +55,6 @@ export const addCity = async (city) => {
   return response.json();
 };
 
-
-export const deleteDog = async (dogId) => {
-  const response = await fetch(`/api/dogs/${dogId}`, {
-    method: "DELETE"
-  });
-
-  if (!response.ok) {
-    throw new Error("Error deleting dog");
-  }
-};
-
 export const assignWalkerToDog = async (dogId, updatedDog) => {
   try {
     const response = await fetch(`/api/dogs/${dogId}`, {
@@ -82,12 +71,41 @@ export const assignWalkerToDog = async (dogId, updatedDog) => {
     if (!response.ok) {
       throw new Error(`Error assigning walker to dog (Status ${response.status})`);
     }
-
+    
     return response.json();
-
+    
   } catch (error) {
     console.error("Error assigning walker to dog:", error);
     throw error;
   }
 };
 
+export const deleteDog = async (dogId) => {
+  const response = await fetch(`/api/dogs/${dogId}`, {
+    method: "DELETE"
+  });
+
+  if (!response.ok) {
+    throw new Error("Error deleting dog");
+  }
+};
+
+export const removeWalker = async (walkerId) => {
+  try {
+    const response = await fetch(`/api/walkers/${walkerId}`, {
+      method: "DELETE",
+    });
+
+    if (!response.ok) {
+      throw new Error(`Error removing walker (Status ${response.status})`);
+    }
+
+    return true; // Return true if the removal was successful
+  
+  } catch (error) {
+    console.error("Error removing walker:", error);
+    throw error;
+  }
+};
+// 这个的error catching是最全面的了, 既有!response.ok 又有error. 
+// 同时有  return true; 不知是否有实质影响; 反正不用也行
