@@ -80,6 +80,28 @@ export const assignWalkerToDog = async (dogId, updatedDog) => {
   }
 };
 
+export const updateWalker = async (walkerId, updatedWalker) => {
+  try {
+    const response = await fetch(`/api/walkers/${walkerId}`, {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(updatedWalker),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Network response was not ok (Status ${response.status})`);
+    }
+
+    return response.json();
+
+  } catch (error) {
+    console.error("Error updating walker:", error);
+    throw error;
+  }
+};
+
 export const deleteDog = async (dogId) => {
   const response = await fetch(`/api/dogs/${dogId}`, {
     method: "DELETE"

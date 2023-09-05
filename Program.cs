@@ -234,6 +234,24 @@ app.MapPut("/api/dogs/{id}", (int id, Dog updatedDog) =>
     //👆这一步也可以省略, 若想要在前端用getDogById来重新fetch也可以
 
     return Results.Json(updatedDog);
+    //Results.Json 或Results.Ok都可以
+});
+
+app.MapPut("/api/walkers/{id}", (int id, Walker updatedWalker) =>
+{
+    // Find the walker by its ID
+    Walker walkerToUpdate = walkers.FirstOrDefault(w => w.Id == id);
+    int walkerToUpdateIndex = walkers.IndexOf(walkerToUpdate);
+
+    if (walkerToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+
+    walkers[walkerToUpdateIndex] = updatedWalker;
+    // 这是PUT的核心: update walkers List in the database; 注意接收的json要完整,不能只是要改变的properties, 因为这是一个完全的覆盖.
+
+    return Results.Json(updatedWalker);
 });
 
 
