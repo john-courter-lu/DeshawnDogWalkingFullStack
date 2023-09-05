@@ -249,5 +249,24 @@ app.MapDelete("/api/dogs/{id}", (int id) =>
 
 });
 
+app.MapDelete("/api/walkers/{id}", (int id) =>
+{
+    // Find the walker by their ID and remove them from the database
+    var walkerToRemove = walkers.FirstOrDefault(w => w.Id == id);
+
+    if (walkerToRemove != null)
+    {
+        walkers.Remove(walkerToRemove);// 这是核心
+        return Results.NoContent();
+        // 这在教材中没有; 测试结果: Server Responses 204 undocumented; Responses 200;
+        // ? server responses VS responses
+    }
+    else
+    {
+        return Results.NotFound();
+        // 这教材中也没有. 但我觉得很必须
+    }
+});
+
 
 app.Run();
