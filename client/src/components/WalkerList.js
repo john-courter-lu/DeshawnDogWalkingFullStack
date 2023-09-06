@@ -5,6 +5,8 @@ import { AssignADog } from "./AssignADog.js";
 import { useNavigate } from "react-router-dom";
 // getCities is for dropdown menu of selecting a city
 // getDogs is for AssignADog
+import WalkerDetailUpdate from "./WalkerDetailUpdate";
+// Import the new component for updating walker details
 
 export const WalkerList = () => {
     const [walkers, setWalkers] = useState([]);
@@ -110,7 +112,7 @@ export const WalkerList = () => {
         //下一步: update dogs' walkerId
         //第一步 找到所有dogsWalkedByMe 会返回一个数组
 
-        const dogsWalkedByMe = dogs.filter(dog=>dog.walkerId === walkerId);
+        const dogsWalkedByMe = dogs.filter(dog => dog.walkerId === walkerId);
 
         //第二步 每一个dog都updateDogs
 
@@ -127,7 +129,13 @@ export const WalkerList = () => {
             //必须要调用apiManager才能达到改动database的目的, 不能只改变UI的结果
             //可以在List of Dogs检查结果
         });
-        
+
+    };
+
+    //下面是更新walker details中, 当点击名字时的onClick
+    const handleEditWalker = (walker) => {
+        // Set the selected walker for editing
+        setSelectedWalker(walker);
     };
 
     return (
@@ -181,7 +189,7 @@ export const WalkerList = () => {
                             >
                                 <ListItemText
                                     primary={walker.name}
-
+                                    onClick={() => handleEditWalker(walker)} // Handle click to update walker details
                                 />
                                 <Button
                                     variant="outlined"
@@ -213,9 +221,31 @@ export const WalkerList = () => {
                 //传过去来组织updatedDog的object
                 onClose={() => {
                     setOpenAssignDialog(false);
+                    setSelectedWalker(null);
                 }}
                 onAssign={handleAssignDogConfirm}
             />
+            {selectedWalker&&!openAssignDialog?  
+                <WalkerDetailUpdate
+                    walker={selectedWalker}
+                    setSelectedWalker={setSelectedWalker}
+                />:""
+            } {/* 
+            {selectedWalker &&
+                <WalkerDetailUpdate
+                    walker={selectedWalker}
+                    setSelectedWalker={setSelectedWalker}
+                />
+            }
+            *//* Show the update form 
+            
+            `&&` is a logical AND operator in JavaScript. In this context, it's used for conditional rendering. It works as follows: if the expression on the left of `&&` is truthy, it evaluates the expression on the right and returns it. If the expression on the left is falsy, it short-circuits and returns the left expression.
+
+            If ``selectedWalker`` is falsy (i.e., there is no selected walker), the expression short-circuits, and nothing is rendered. This is a common way to conditionally render components or content in React based on some condition.
+
+            In essence, this line of code is saying, "If ``selectedWalker`` exists (is truthy), render the WalkerDetailUpdate component." It's a convenient way to show or hide components based on certain conditions in your application's UI
+            
+            */}
         </div>
     );
 }
