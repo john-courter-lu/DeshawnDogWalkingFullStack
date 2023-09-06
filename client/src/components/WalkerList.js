@@ -229,6 +229,7 @@ export const WalkerList = () => {
                 <WalkerDetailUpdate
                     walker={selectedWalker}
                     setSelectedWalker={setSelectedWalker}
+                    cities={cities}
                 />:""
             } {/* 
             {selectedWalker &&
