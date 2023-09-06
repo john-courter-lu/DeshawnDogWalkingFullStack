@@ -254,6 +254,33 @@ app.MapPut("/api/walkers/{id}", (int id, Walker updatedWalker) =>
     return Results.Json(updatedWalker);
 });
 
+//上面做的只是修改walker的基本信息
+//下面要做的是修改walker的cities信息
+
+app.MapPut("/api/walkercities", (Walker selectedWalker, List<City> updatedCityListForSelectedWalker) =>
+{
+    //Our first task is to remove the current WalkerCity items associated with the walker:
+
+    walkerCities = walkerCities.Where(wc => wc.WalkerId != selectedWalker.Id).ToList();
+
+    //Then, we add new WalkerCity items for each of the cities in the Walker object sent to the server from the client:
+
+    foreach (City city in updatedCityListForSelectedWalker)
+    {
+        WalkerCity newWC = new WalkerCity
+        {
+            WalkerId = selectedWalker.Id,
+            CityId = city.Id,
+            Id = walkerCities.Count > 0 ? walkerCities.Max(wc => wc.Id) + 1 : 1
+        };
+        
+        walkerCities.Add(newWC);
+    }
+    //The endpoint that implements this logic functions as the Create, Update, and Delete functionality for walker cities, because the client should send the entire list of correct cities every time the walker is updated (which will either be larger, smaller, or the same size as the previous list of cities for the walker).
+
+    return Results.Ok(walkerCities);
+    //这是我自己加的. 教材上没有.
+});
 
 app.MapDelete("/api/dogs/{id}", (int id) =>
 {
