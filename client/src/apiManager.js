@@ -103,14 +103,14 @@ export const updateWalker = async (walkerId, updatedWalker) => {
 };
 
 // update walkerCities or cities for a walker
-export const updateCitiesForWalker = async (selectedWalker, updatedCityListForSelectedWalker) => {
+export const updateCitiesForWalker = async (selectedWalker) => {
   try {
     const response = await fetch(`/api/walkercities`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify(updatedCityListForSelectedWalker),
+      body: JSON.stringify(selectedWalker),
     });
 
     if (!response.ok) {

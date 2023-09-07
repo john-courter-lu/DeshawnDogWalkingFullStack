@@ -257,13 +257,32 @@ app.MapPut("/api/walkers/{id}", (int id, Walker updatedWalker) =>
 //上面做的只是修改walker的基本信息
 //下面要做的是修改walker的cities信息
 
-app.MapPut("/api/walkercities", (Walker selectedWalker, List<City> updatedCityListForSelectedWalker) =>
+app.MapPut("/api/walkercities", (Walker selectedWalker) =>
 {
+
+
     //Our first task is to remove the current WalkerCity items associated with the walker:
 
     walkerCities = walkerCities.Where(wc => wc.WalkerId != selectedWalker.Id).ToList();
 
     //Then, we add new WalkerCity items for each of the cities in the Walker object sent to the server from the client:
+
+    List<City> updatedCityListForSelectedWalker = selectedWalker.Cities;
+
+    //点评: 把这个param List<City> updatedCityListForSelectedWalker 传递到这个endpoint会有complier error
+
+    /* 
+    Unhandled exception. System.InvalidOperationException: Failure to infer one or more parameters.
+    Below is the list of parameters that we found:
+
+    Parameter           | Source
+    ---------------------------------------------------------------------------------
+    selectedWalker      | Body (Inferred)
+    updatedCityListForSelectedWalker | UNKNOWN
+
+
+    Did you mean to register the "UNKNOWN" parameters as a Service? 
+    */
 
     foreach (City city in updatedCityListForSelectedWalker)
     {
@@ -273,13 +292,17 @@ app.MapPut("/api/walkercities", (Walker selectedWalker, List<City> updatedCityLi
             CityId = city.Id,
             Id = walkerCities.Count > 0 ? walkerCities.Max(wc => wc.Id) + 1 : 1
         };
-        
+
         walkerCities.Add(newWC);
     }
     //The endpoint that implements this logic functions as the Create, Update, and Delete functionality for walker cities, because the client should send the entire list of correct cities every time the walker is updated (which will either be larger, smaller, or the same size as the previous list of cities for the walker).
 
-    return Results.Ok(walkerCities);
+    return Results.Ok(selectedWalker);
     //这是我自己加的. 教材上没有.
+    //而且.Ok()里面必须有内容, 否则apiManager中"return response.json()"就会有下面的错误:
+    /* 
+    Error updating walker: SyntaxError: Unexpected end of JSON input
+    */
 });
 
 app.MapDelete("/api/dogs/{id}", (int id) =>
