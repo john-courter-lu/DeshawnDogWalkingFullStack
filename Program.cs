@@ -47,7 +47,11 @@ List<WalkerCity> walkerCities = new List<WalkerCity>
     new WalkerCity { Id = 11, WalkerId = 6, CityId = 9 },
     new WalkerCity { Id = 12, WalkerId = 9, CityId = 7 },
     new WalkerCity { Id = 13, WalkerId = 5, CityId = 7 },
-    new WalkerCity { Id = 14, WalkerId = 10, CityId = 2 }
+    new WalkerCity { Id = 14, WalkerId = 10, CityId = 2 },
+    new WalkerCity { Id = 15, WalkerId = 3, CityId = 1 },
+    new WalkerCity { Id = 16, WalkerId = 7, CityId = 3 },
+    new WalkerCity { Id = 17, WalkerId = 3, CityId = 4 },
+    new WalkerCity { Id = 18, WalkerId = 8, CityId = 5 }
 };
 
 List<City> cities = new List<City>
@@ -205,6 +209,101 @@ app.MapPost("/api/cities", (City city) =>
     //会pass if(response.ok) , Results.OK是默认, 但是Results.Created也行
 });
 
+app.MapPut("/api/dogs/{id}", (int id, Dog updatedDog) =>
+{
+    // Find the dog by its ID
+    // and the goal is to get the index of it so we can update that obj in List<Dog> dogs
+    Dog dogToUpdate = dogs.FirstOrDefault(d => d.Id == id);
+    int dogToUpdateIndex = dogs.IndexOf(dogToUpdate);
+
+    if (dogToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+    if (id != updatedDog.Id)
+    {
+        return Results.BadRequest();
+    }
+
+    dogs[dogToUpdateIndex] = updatedDog;
+    // 这是PUT的核心: 新object取代旧的object, 所以前端要保证新的object的完整性.
+
+    //下面加入两个properties
+    updatedDog.Walker = walkers.FirstOrDefault(w => w.Id == updatedDog.WalkerId);
+    updatedDog.City = cities.FirstOrDefault(c => c.Id == updatedDog.CityId);
+    //👆这一步也可以省略, 若想要在前端用getDogById来重新fetch也可以
+
+    return Results.Json(updatedDog);
+    //Results.Json 或Results.Ok都可以
+});
+
+app.MapPut("/api/walkers/{id}", (int id, Walker updatedWalker) =>
+{
+    // Find the walker by its ID
+    Walker walkerToUpdate = walkers.FirstOrDefault(w => w.Id == id);
+    int walkerToUpdateIndex = walkers.IndexOf(walkerToUpdate);
+
+    if (walkerToUpdate == null)
+    {
+        return Results.NotFound();
+    }
+
+    walkers[walkerToUpdateIndex] = updatedWalker;
+    // 这是PUT的核心: update walkers List in the database; 注意接收的json要完整,不能只是要改变的properties, 因为这是一个完全的覆盖.
+
+    return Results.Json(updatedWalker);
+});
+
+//上面做的只是修改walker的基本信息
+//下面要做的是修改walker的cities信息
+
+app.MapPut("/api/walkercities", (Walker selectedWalker) =>
+{
+
+
+    //Our first task is to remove the current WalkerCity items associated with the walker:
+
+    walkerCities = walkerCities.Where(wc => wc.WalkerId != selectedWalker.Id).ToList();
+
+    //Then, we add new WalkerCity items for each of the cities in the Walker object sent to the server from the client:
+
+    List<City> updatedCityListForSelectedWalker = selectedWalker.Cities;
+
+    //点评: 把这个param List<City> updatedCityListForSelectedWalker 传递到这个endpoint会有complier error
+
+    /* 
+    Unhandled exception. System.InvalidOperationException: Failure to infer one or more parameters.
+    Below is the list of parameters that we found:
+
+    Parameter           | Source
+    ---------------------------------------------------------------------------------
+    selectedWalker      | Body (Inferred)
+    updatedCityListForSelectedWalker | UNKNOWN
+
+
+    Did you mean to register the "UNKNOWN" parameters as a Service? 
+    */
+
+    foreach (City city in updatedCityListForSelectedWalker)
+    {
+        WalkerCity newWC = new WalkerCity
+        {
+            WalkerId = selectedWalker.Id,
+            CityId = city.Id,
+            Id = walkerCities.Count > 0 ? walkerCities.Max(wc => wc.Id) + 1 : 1
+        };
+
+        walkerCities.Add(newWC);
+    }
+    //The endpoint that implements this logic functions as the Create, Update, and Delete functionality for walker cities, because the client should send the entire list of correct cities every time the walker is updated (which will either be larger, smaller, or the same size as the previous list of cities for the walker).
+
+    return Results.Ok(selectedWalker);
+    //这是我自己加的. 教材上没有.
+    //而且.Ok()里面必须有内容, 否则apiManager中"return response.json()"就会有下面的错误:
+    /* 
+    Error updating walker: SyntaxError: Unexpected end of JSON input
+    */
+});
 
 app.MapDelete("/api/dogs/{id}", (int id) =>
 {
@@ -216,6 +315,25 @@ app.MapDelete("/api/dogs/{id}", (int id) =>
         dogs.Remove(dogToRemove);
     }
 
+});
+
+app.MapDelete("/api/walkers/{id}", (int id) =>
+{
+    // Find the walker by their ID and remove them from the database
+    var walkerToRemove = walkers.FirstOrDefault(w => w.Id == id);
+
+    if (walkerToRemove != null)
+    {
+        walkers.Remove(walkerToRemove);// 这是核心
+        return Results.NoContent();
+        // 这在教材中没有; 测试结果: Server Responses 204 undocumented; Responses 200;
+        // ? server responses VS responses
+    }
+    else
+    {
+        return Results.NotFound();
+        // 这教材中也没有. 但我觉得很必须
+    }
 });
 
 
